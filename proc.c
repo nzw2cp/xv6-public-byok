@@ -6,6 +6,7 @@
 #include "x86.h"
 #include "proc.h"
 #include "spinlock.h"
+#include "pstat.h"
 
 struct {
   struct spinlock lock;
@@ -88,7 +89,7 @@ allocproc(void)
 found:
   p->state = EMBRYO;
   p->pid = nextpid++;
-
+  p->numTicks = 0;
   release(&ptable.lock);
 
   // Allocate kernel stack.
@@ -343,6 +344,8 @@ scheduler(void)
       switchuvm(p);
       p->state = RUNNING;
 
+      p->numTicks += 1; // one more time scheduled on a CPU
+
       swtch(&(c->scheduler), p->context);
       switchkvm();
 
@@ -531,4 +534,54 @@ procdump(void)
     }
     cprintf("\n");
   }
+}
+
+
+void
+ps(void)
+{
+  static char *states[] = {
+  [UNUSED]    "unused",
+  [EMBRYO]    "embryo",
+  [SLEEPING]  "sleep ",
+  [RUNNABLE]  "runble",
+  [RUNNING]   "run   ",
+  [ZOMBIE]    "zombie"
+  };
+  struct proc *p;
+  char *state;
+  // int i;
+  // uint pc[10];
+
+  acquire(&ptable.lock);
+  cprintf("PID\tState\tName\tSize\n");
+
+  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+    if(p->state == UNUSED)
+      continue;
+    if(p->state >= 0 && p->state < NELEM(states) && states[p->state])
+      state = states[p->state];
+    else
+      state = "???";
+    cprintf("%d\t%s\t%s\t%d\n", p->pid, state, p->name, p->sz);
+  }
+  release(&ptable.lock);
+}
+
+int
+getpinfo(struct pstat *ps)
+{
+  struct proc *p;
+  int i;
+
+  acquire(&ptable.lock);
+  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+    i = p - ptable.proc; // slot index, always matches p
+    ps->inuse[i] = (p->state != UNUSED);
+    ps->pid[i] = p->pid;
+    ps->ticks[i] = p->numTicks;
+    ps->size[i] = p->sz;
+  }
+  release(&ptable.lock);
+  return 0;
 }

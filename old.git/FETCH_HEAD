@@ -1,0 +1,17 @@
+eeb7b415dbcb12cc362d0783e41c3d1f44066b17		branch 'master' of https://github.com/mit-pdos/xv6-public
+af0e851a3a8a7d13bc2f2d596b58500594040892	not-for-merge	tag 'osdi12-submit' of https://github.com/mit-pdos/xv6-public
+9e698c587b135db17b38a5838976805b9c01e338	not-for-merge	tag 'symlinks' of https://github.com/mit-pdos/xv6-public
+05e0b1218dcebe1f40028531b51926df8ae52be0	not-for-merge	tag 'xv6-2006' of https://github.com/mit-pdos/xv6-public
+42f3c3f7be9717b66ba6e133a113c0f751c53133	not-for-merge	tag 'xv6-2007' of https://github.com/mit-pdos/xv6-public
+adcd16c3f7588b4a28d37495f05e94278c9e3a1e	not-for-merge	tag 'xv6-2008' of https://github.com/mit-pdos/xv6-public
+124fe7e457c0dc9b671c7ffccb56004eb61da4f0	not-for-merge	tag 'xv6-2010' of https://github.com/mit-pdos/xv6-public
+5922cdbbcc4fdbd76eec9e0dad9f650e4c86ee99	not-for-merge	tag 'xv6-rev0' of https://github.com/mit-pdos/xv6-public
+81f31a773dd49b001437eaed3975438585ff9911	not-for-merge	tag 'xv6-rev1' of https://github.com/mit-pdos/xv6-public
+b818915f793cd20c5d1e24f668534a9d690f3cc8	not-for-merge	tag 'xv6-rev11' of https://github.com/mit-pdos/xv6-public
+30dab73b68b816877dc8f78504ceca0808c976eb	not-for-merge	tag 'xv6-rev3' of https://github.com/mit-pdos/xv6-public
+113005d48f09a4e3939940d72a77bf6973ea8755	not-for-merge	tag 'xv6-rev4' of https://github.com/mit-pdos/xv6-public
+d6aa754494b37e32862b1f78d53deedc53f66a15	not-for-merge	tag 'xv6-rev5' of https://github.com/mit-pdos/xv6-public
+3e9d6413d331b4c912d55bfac253af1629d4bac9	not-for-merge	tag 'xv6-rev6' of https://github.com/mit-pdos/xv6-public
+ccc25c0fac59067d88af52ad9f3b8cee97c3810a	not-for-merge	tag 'xv6-rev7' of https://github.com/mit-pdos/xv6-public
+7d6f95e327f1c18570d5dd187e3d92e1aadae2cf	not-for-merge	tag 'xv6-rev8' of https://github.com/mit-pdos/xv6-public
+5bf3fbee00fb27cb8cb4eca72dcd9fc4c288ed71	not-for-merge	tag 'xv6-rev9' of https://github.com/mit-pdos/xv6-public

@@ -78,3 +78,6 @@ bootmain.c
 
 # link
 kernel.ld
+
+# byok
+# byok.h

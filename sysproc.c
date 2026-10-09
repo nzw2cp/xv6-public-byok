@@ -6,6 +6,51 @@
 #include "memlayout.h"
 #include "mmu.h"
 #include "proc.h"
+#include "pstat.h"
+
+int partAcount = 0;
+int partBcount = 0;
+int partCcount = 0;
+
+int
+sys_getpinfo(void)
+// sys_getpinfo(struct pstat *ps)
+{
+  char *addr;
+  struct pstat *ps;
+  
+  if(argptr(0, &addr, sizeof(struct pstat)) < 0 || addr == 0)
+    return -1;
+
+  ps = (struct pstat *)addr;
+  return getpinfo(ps);
+}
+
+int
+sys_firstPart(void)
+{
+  return partAcount;
+}
+
+int
+sys_secondPart(void)
+{
+  return partBcount;
+}
+
+int
+sys_thirdPart(void)
+{
+  return partCcount;
+}
+
+int
+sys_ps(void)
+{
+  ps();
+
+  return 1;
+}
 
 int
 sys_fork(void)
@@ -39,6 +84,7 @@ sys_kill(void)
 int
 sys_getpid(void)
 {
+  partAcount++;
   return myproc()->pid;
 }
 
