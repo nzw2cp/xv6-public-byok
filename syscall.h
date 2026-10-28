@@ -25,3 +25,4 @@
 #define SYS_thirdPart  24
 #define SYS_ps         25
 #define SYS_getpinfo   26
+#define SYS_settickets 27

@@ -90,6 +90,9 @@ found:
   p->state = EMBRYO;
   p->pid = nextpid++;
   p->numTicks = 0;
+  p->tickets = DEFAULT_TICKETS;
+  p->stride = STRIDE_BIG / p->tickets;
+  p->pass = 0;
   release(&ptable.lock);
 
   // Allocate kernel stack.
@@ -195,6 +198,8 @@ fork(void)
     kfree(np->kstack);
     np->kstack = 0;
     np->state = UNUSED;
+    np->tickets = curproc->tickets;
+    np->stride = curproc->stride;
     return -1;
   }
   np->sz = curproc->sz;
@@ -554,7 +559,7 @@ ps(void)
   // uint pc[10];
 
   acquire(&ptable.lock);
-  cprintf("PID\tState\tName\tSize\n");
+  cprintf("PID\tState\tName\tSize\tTickets\tStride\tPass\n");
 
   for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
     if(p->state == UNUSED)
@@ -563,7 +568,7 @@ ps(void)
       state = states[p->state];
     else
       state = "???";
-    cprintf("%d\t%s\t%s\t%d\n", p->pid, state, p->name, p->sz);
+    cprintf("%d\t%s\t%s\t%d\t%d\t%d\t%d\n",p->pid, state, p->name, p->sz,p->tickets, p->stride, p->pass);
   }
   release(&ptable.lock);
 }
@@ -581,7 +586,23 @@ getpinfo(struct pstat *ps)
     ps->pid[i] = p->pid;
     ps->ticks[i] = p->numTicks;
     ps->size[i] = p->sz;
+    ps->tickets[i] = p->tickets;
+    ps->stride[i] = p->stride;
+    ps->pass[i] = p->pass;  
   }
   release(&ptable.lock);
+  return 0;
+}
+
+int
+settickets(int n)
+{
+  acquire(&ptable.lock);
+
+  myproc()->tickets = n;
+  myproc()->stride = STRIDE_BIG / n;
+
+  release(&ptable.lock);
+
   return 0;
 }

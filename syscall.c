@@ -108,6 +108,7 @@ extern int sys_secondPart(void);
 extern int sys_thirdPart(void);
 extern int sys_ps(void);
 extern int sys_getpinfo(void);
+extern int sys_settickets(void);
 
 extern int partBcount;
 extern int partCcount;
@@ -139,6 +140,7 @@ static int (*syscalls[])(void) = {
 [SYS_thirdPart]  sys_thirdPart,
 [SYS_ps]         sys_ps,
 [SYS_getpinfo]   sys_getpinfo,
+[SYS_settickets] sys_settickets,
 };
 
 void

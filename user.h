@@ -30,6 +30,7 @@ int thirdPart(void);
 int ps(void);
 // int getpinfo(void);
 int getpinfo(struct pstat*);
+int settickets(int);
 
 // ulib.c
 int stat(const char*, struct stat*);
