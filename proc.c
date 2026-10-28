@@ -29,6 +29,18 @@ static void wakeup1(void *chan);
 #define SCHED_NAME "RR"
 #endif
 
+static uint rseed = 2463534242; // any nonzero starting value
+
+static uint
+rand(void)
+{
+  rseed ^= rseed << 13;
+  rseed ^= rseed >> 17;
+  rseed ^= rseed << 5;
+  
+  return rseed;
+}
+
 void
 pinit(void)
 {
@@ -349,17 +361,53 @@ scheduler(void)
     acquire(&ptable.lock);
 
     #if defined(SCHED_LOTTERY)
-    // Phase 4 goes here
-      p = ptable.proc;
-      if(p->state != RUNNABLE)
-        continue;
-      #elif defined(SCHED_STRIDE)
+      int total  = 0;
+      int winner = 0;
+
+      // TODO 1: total = sum of tickets of all RUNNABLE processes
+      for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+        total += p->tickets;
+      }
+      if(total <= 0){
+        cprintf(1, "0 tickets");
+        break;
+      }
+      winner = rand() % total; // a number from 0 to total-1
+
+      // TODO 2: walk ptable. For each RUNNABLE p:
+      // add p->tickets to counter;
+      // if counter > winner, run p with the same lines
+      // as Lab 2 (proc = p; switchuvm(p); p->state = RUNNING;
+      // p->numTicks += 1; swtch(...); switchkvm(); proc = 0;)
+      // and then break out of the loop.
+      for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+        winner -= p->tickets;
+        if(winner > 0)
+          continue;
+        if(p->state != RUNNABLE)
+          continue;
+          
+        c->proc = p;
+        switchuvm(p);
+        p->state = RUNNING;
+    
+        p->numTicks += 1; // one more time scheduled on a CPU
+    
+        swtch(&(c->scheduler), p->context);
+        switchkvm();
+    
+        // Process is done running for now.
+        // It should have changed its p->state before coming back.
+        c->proc = 0;
+
+        break;
+      }
+    #elif defined(SCHED_STRIDE)
       // Phase 5 goes here
       p = ptable.proc;
       if(p->state != RUNNABLE)
         continue;
     #else
-      // The original Round Robin loop from Lab 2, unchanged
       // Loop over process table looking for process to run.
       for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
         if(p->state != RUNNABLE)
@@ -384,7 +432,6 @@ scheduler(void)
     #endif
 
     release(&ptable.lock);
-
   }
 }
 

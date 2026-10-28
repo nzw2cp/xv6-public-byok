@@ -103,6 +103,8 @@ CFLAGS += -DSCHED_$(SCHED)
 proc.o: .sched
 FORCE:
 
+CFLAGS += -Wno-error
+
 xv6.img: bootblock kernel
 	dd if=/dev/zero of=xv6.img count=10000
 	dd if=bootblock of=xv6.img conv=notrunc
