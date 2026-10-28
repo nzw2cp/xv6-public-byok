@@ -202,6 +202,7 @@ UPROGS=\
 	_accessTable\
 	_children_test\
     _store\
+	_schedtest\
 
 fs.img: mkfs README $(UPROGS)
 	./mkfs fs.img README $(UPROGS)
