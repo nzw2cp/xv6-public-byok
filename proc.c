@@ -21,6 +21,14 @@ extern void trapret(void);
 
 static void wakeup1(void *chan);
 
+#if defined(SCHED_LOTTERY)
+#define SCHED_NAME "LOTTERY"
+#elif defined(SCHED_STRIDE)
+#define SCHED_NAME "STRIDE"
+#else
+#define SCHED_NAME "RR"
+#endif
+
 void
 pinit(void)
 {
@@ -145,6 +153,8 @@ userinit(void)
 
   safestrcpy(p->name, "initcode", sizeof(p->name));
   p->cwd = namei("/");
+
+  cprintf("scheduler: %s\n", SCHED_NAME);
 
   // this assignment to p->state lets other cores
   // run this process. the acquire forces the above
@@ -336,28 +346,43 @@ scheduler(void)
     // Enable interrupts on this processor.
     sti();
 
-    // Loop over process table looking for process to run.
     acquire(&ptable.lock);
-    for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+
+    #if defined(SCHED_LOTTERY)
+    // Phase 4 goes here
+      p = ptable.proc;
       if(p->state != RUNNABLE)
         continue;
+      #elif defined(SCHED_STRIDE)
+      // Phase 5 goes here
+      p = ptable.proc;
+      if(p->state != RUNNABLE)
+        continue;
+    #else
+      // The original Round Robin loop from Lab 2, unchanged
+      // Loop over process table looking for process to run.
+      for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+        if(p->state != RUNNABLE)
+          continue;
 
-      // Switch to chosen process.  It is the process's job
-      // to release ptable.lock and then reacquire it
-      // before jumping back to us.
-      c->proc = p;
-      switchuvm(p);
-      p->state = RUNNING;
+        // Switch to chosen process.  It is the process's job
+        // to release ptable.lock and then reacquire it
+        // before jumping back to us.
+        c->proc = p;
+        switchuvm(p);
+        p->state = RUNNING;
 
-      p->numTicks += 1; // one more time scheduled on a CPU
+        p->numTicks += 1; // one more time scheduled on a CPU
 
-      swtch(&(c->scheduler), p->context);
-      switchkvm();
+        swtch(&(c->scheduler), p->context);
+        switchkvm();
 
-      // Process is done running for now.
-      // It should have changed its p->state before coming back.
-      c->proc = 0;
-    }
+        // Process is done running for now.
+        // It should have changed its p->state before coming back.
+        c->proc = 0;
+      }
+    #endif
+
     release(&ptable.lock);
 
   }

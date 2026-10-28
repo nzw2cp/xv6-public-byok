@@ -90,6 +90,19 @@ ifneq ($(shell $(CC) -dumpspecs 2>/dev/null | grep -e '[^f]nopie'),)
 CFLAGS += -fno-pie -nopie
 endif
 
+# Scheduler selection: make qemu-nox SCHED=LOTTERY
+SCHED ?= RR
+ifeq ($(filter $(SCHED),RR LOTTERY STRIDE),)
+	$(error SCHED must be RR, LOTTERY or STRIDE)
+endif
+KERNEL_CFLAGS += -DSCHED_$(SCHED)
+CFLAGS += -DSCHED_$(SCHED)
+# Recompile proc.c whenever SCHED changes
+.sched: FORCE
+	@echo $(SCHED) | cmp -s - $@ || echo $(SCHED) > $@
+proc.o: .sched
+FORCE:
+
 xv6.img: bootblock kernel
 	dd if=/dev/zero of=xv6.img count=10000
 	dd if=bootblock of=xv6.img conv=notrunc
